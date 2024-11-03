@@ -1,0 +1,60 @@
+body {
+    margin-top: 20px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+/* Indicatore di stato */
+.status-indicator {
+    font-weight: bold;
+}
+
+/* Modalità notturna */
+.night-mode {
+    background-color: #121212; /* Colore di sfondo scuro */
+    color: #000000; /* Colore del testo chiaro */
+}
+
+/* Stili per le card in modalità notturna */
+.night-mode .card {
+    background-color: #1e1e1e; /* Colore di sfondo della card */
+    border-color: #333; /* Colore del bordo della card */
+}
+
+/* Pulsanti in modalità notturna */
+.night-mode .btn {
+    background-color: #333; /* Colore di sfondo del pulsante */
+    color: #e0e0e0; /* Colore del testo del pulsante */
+}
+
+/* Pulsante primario in modalità notturna */
+.night-mode .btn-primary {
+    background-color: #3f51b5; /* Colore di sfondo del pulsante primario */
+    border-color: #3f51b5; /* Colore del bordo del pulsante primario */
+    color: #fff; /* Colore del testo del pulsante primario */
+}
+
+/* Pulsante di successo in modalità notturna */
+.night-mode .btn-success {
+    background-color: #4caf50; /* Colore di sfondo del pulsante di successo */
+    border-color: #4caf50; /* Colore del bordo del pulsante di successo */
+    color: #fff; /* Colore del testo del pulsante di successo */
+}
+
+/* Pulsante di pericolo in modalità notturna */
+.night-mode .btn-danger {
+    background-color: #f44336; /* Colore di sfondo del pulsante di pericolo */
+    border-color: #f44336; /* Colore del bordo del pulsante di pericolo */
+    color: #fff; /* Colore del testo del pulsante di pericolo */
+}
+
+/* Titoli in modalità notturna */
+h1, h2, h3, h4, h5, h6, p {
+    color: #000000; /* Colore chiaro per i titoli */
+}
+
+/* Paragrafi in modalità notturna */
+.night-mode p {
+    color: #ddd; /* Colore chiaro per i paragrafi */
+}
+
+/* Aggiungere eventuali altri stili per elementi specifici se necessario */
