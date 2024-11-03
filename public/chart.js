@@ -6,7 +6,7 @@ const ctxJerk = document.getElementById('jerkChart').getContext('2d');
 
 // Dati iniziali
 let time = 0;
-const timeStep = 1; // secondi
+const timeStep = 0.1; // secondi
 const maxDataPoints = 60; // Numero massimo di punti dati nel grafico
 
 // Dati per i grafici
@@ -24,7 +24,7 @@ let velocita = 0;
 let accelerazione = 0;
 let jerk = 0;
 
-// Creazione dei grafici
+// Creazione dei grafici secondari
 const posizioneChart = new Chart(ctxPosizione, {
     type: 'line',
     data: {
@@ -149,29 +149,53 @@ const jerkChart = new Chart(ctxJerk, {
 let updateInterval;
 
 // Funzione per iniziare la comunicazione
-function startCommunication() {
-    console.log("Inizio comunicazione con Arduino...");
-    
-    // Inizia l'aggiornamento dei grafici ogni 200 ms
-    updateInterval = setInterval(updateCharts, 200);
-    
-    // Disabilita i pulsanti durante la comunicazione
-    document.getElementById("start-communication-btn").disabled = true; // Disabilita il pulsante di inizio
-    document.getElementById("stop-communication-btn").disabled = false; // Abilita il pulsante di stop
-    document.getElementById("clear-charts-btn").disabled = true; // Disabilita il pulsante di pulizia grafici
+async function readDataFromArduino() {
+    const textDecoder = new TextDecoder();
+    let buffer = ''; // Buffer to store partial data chunks
+
+    while (communicationActive) {
+        try {
+            const { value, done } = await reader.read();
+            if (done) {
+                console.log("Stream finished.");
+                break;
+            }
+            // Decode the data and add it to the buffer
+            buffer += textDecoder.decode(value, { stream: true });
+
+            // Check for newline characters to process each complete line of data
+            let lines = buffer.split('\n');
+            buffer = lines.pop(); // Save the last, potentially incomplete line back to the buffer
+
+            for (let line of lines) {
+                line = line.trim(); // Remove any extra whitespace
+                if (line) {
+                    processArduinoData(line);
+                }
+            }
+        } catch (error) {
+            console.error("Error reading from Arduino:", error);
+            break; // Exit loop on error
+        }
+    }
 }
 
-// Funzione per fermare la comunicazione
-function stopCommunication() {
-    console.log("Fine comunicazione con Arduino...");
-    
-    // Ferma l'aggiornamento dei grafici
-    clearInterval(updateInterval);
-    
-    // Abilita i pulsanti dopo aver fermato la comunicazione
-    document.getElementById("start-communication-btn").disabled = false; // Riabilita il pulsante di inizio
-    document.getElementById("stop-communication-btn").disabled = true; // Disabilita il pulsante di stop
-    document.getElementById("clear-charts-btn").disabled = false; // Abilita il pulsante di pulizia grafici
+function processArduinoData(data) {
+    try {
+        // Expect data in the format "2.00,-1.00,1.00,-5.00"
+        const values = data.split(',');
+        
+        // Convert to floats and assign
+        const posizione = parseFloat(values[0]);
+        const velocita = parseFloat(values[1]);
+        const accelerazione = parseFloat(values[2]);
+        const jerk = parseFloat(values[3]);
+
+        // Log the received data
+        updateCharts(posizione, velocita, accelerazione, jerk);
+    } catch (err) {
+        console.warn("Data format error:", data);
+    }
 }
 
 // Funzione per pulire i grafici
@@ -193,31 +217,12 @@ function clearCharts() {
 }
 
 // Funzione per aggiornare i dati dei grafici
-function updateCharts() {
+function updateCharts(p, v, a, j) {
     // Aggiorna il tempo
     time += timeStep;
 
-    // Genera una variazione della posizione casuale per simulare un movimento
-    const variazionePosizione = (Math.random() * 2 - 1).toFixed(3); // Variazione casuale della posizione
-    posizione += parseFloat(variazionePosizione); // Aggiorna la posizione
-
-    // Calcola la velocità (differenza di posizione nel tempo)
-    velocita = (posizioneData.length > 0) 
-                ? (posizione - posizioneData[posizioneData.length - 1]) / timeStep 
-                : 0;
-
-    // Calcola l'accelerazione (differenza di velocità nel tempo)
-    accelerazione = (velocitaData.length > 0) 
-                    ? (velocita - velocitaData[velocitaData.length - 1]) / timeStep 
-                    : 0;
-
-    // Calcola il jerk (differenza di accelerazione nel tempo)
-    jerk = (accelerazioneData.length > 0) 
-            ? (accelerazione - accelerazioneData[accelerazioneData.length - 1]) / timeStep 
-            : 0;
-
-    // Se il numero di punti supera il massimo, rimuovi il primo dato
-    if (timeLabels.length > maxDataPoints) {
+    // Limita il numero di punti dati nel grafico
+    if (posizioneData.length >= maxDataPoints) {
         posizioneData.shift();
         velocitaData.shift();
         accelerazioneData.shift();
@@ -225,16 +230,14 @@ function updateCharts() {
         timeLabels.shift();
     }
 
-    // Aggiungi i nuovi dati ai grafici
-    posizioneData.push(posizione.toFixed(3)); // Aggiungi posizione
-    velocitaData.push(velocita.toFixed(3)); // Aggiungi velocità
-    accelerazioneData.push(accelerazione.toFixed(3)); // Aggiungi accelerazione
-    jerkData.push(jerk.toFixed(3)); // Aggiungi jerk
+    // Aggiungi i nuovi dati
+    posizioneData.push(p.toFixed(3));
+    velocitaData.push((v).toFixed(3));
+    accelerazioneData.push(a.toFixed(3));
+    jerkData.push(j.toFixed(3));
+    timeLabels.push(time.toFixed(1));
 
-    // Aggiungi l'etichetta del tempo
-    timeLabels.push(time);
-
-    // Aggiorna i grafici
+    // Aggiorna i grafici secondari
     posizioneChart.update();
     velocitaChart.update();
     accelerazioneChart.update();

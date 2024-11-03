@@ -48,13 +48,34 @@ body {
 }
 
 /* Titoli in modalità notturna */
-h1, h2, h3, h4, h5, h6, p {
+h1, h2, h3, h4, h5, h6, p, label {
     color: #000000; /* Colore chiaro per i titoli */
 }
 
-/* Paragrafi in modalità notturna */
-.night-mode p {
-    color: #ddd; /* Colore chiaro per i paragrafi */
-}
 
-/* Aggiungere eventuali altri stili per elementi specifici se necessario */
+#arduino-code {
+    display: flex;
+    font-family: 'Courier New', Courier, monospace;
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: auto;
+    max-height: 4000px; /* Set a max height for scrolling */
+}
+#arduino-code code {
+    padding: 10px;
+    white-space: pre; /* Preserve white space */
+}
+.line-number {
+    padding: 10px;
+    background-color: #e8e8e8;
+    border-right: 1px solid #ccc;
+    text-align: right;
+    color: #888;
+}
+.code-line {
+    display: flex;
+}
+.code-line:hover {
+    background-color: #eef; /* Highlight line on hover */
+}

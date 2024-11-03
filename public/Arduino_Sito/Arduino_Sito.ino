@@ -2,45 +2,49 @@
 const int potPin = A0; // Pin a cui è collegato il potenziometro
 const float timeStep = 0.1; // Passo temporale in secondi
 float posizione = 0; // Posizione angolare corrente
-float lastPosizione = 0; // Ultima posizione angolare letta
 float velocita = 0; // Velocità angolare
 float accelerazione = 0; // Accelerazione angolare
 float jerk = 0; // Jerk angolare
+float lastPosizione = 0; // Posizione angolare corrente
+float lastVelocita = 0; // Velocità angolare
+float lastAccelerazione = 0; // Accelerazione angolare
+unsigned long previousMillis = 0; // Tempo precedente per il controllo della frequenza di invio
 
 void setup() {
-    Serial.begin(9600); // Inizializza la comunicazione seriale
+    Serial.begin(115200); // Inizializza la comunicazione seriale
 }
 
 void loop() {
+    unsigned long currentMillis = millis(); // Ottiene il tempo corrente
 
-    float lastPosizione = posizione;
-    float lastVelocita = velocita;
-    float lastAccelerazione = accelerazione;
-    // Legge il valore dal potenziometro (0-1023) e lo mappa in un range di 0-360°
-    int potValue = analogRead(potPin);
-    posizione = map(potValue, 0, 1023, 0, 360); // Mappa il valore in gradi
+    // Controlla se è trascorso il tempo per inviare i dati
+    if (currentMillis - previousMillis >= 100) { // Invia dati ogni 100 ms
+        previousMillis = currentMillis; // Aggiorna il tempo precedente
 
-    // Calcola la velocità (differenza di posizione nel tempo)
-    velocita = (posizione - lastPosizione) / timeStep;
+        // Legge il valore dal potenziometro (0-1023) e lo mappa in un range di 0-360°
+        int potValue = analogRead(potPin);
+        posizione = map(potValue, 0, 1023, 0, 360); // Mappa il valore in gradi
 
-    // Calcola l'accelerazione (differenza di velocità nel tempo)
-    accelerazione = (velocita - lastVelocita) / timeStep;
+        // Calcola la velocità (differenza di posizione nel tempo)
+        velocita = (posizione - lastPosizione) / timeStep;
+        lastPosizione = posizione; // Salva l'ultima posizione
 
-    // Calcola il jerk (differenza di accelerazione nel tempo)
-    jerk = (accelerazione - lastAccelerazione) / timeStep;
+        // Calcola l'accelerazione (differenza di velocità nel tempo)
+        accelerazione = (velocita - lastVelocita) / timeStep;
+        lastVelocita = velocita; // Salva l'ultima velocità
 
-    // Invia i dati sulla porta seriale
-    Serial.print(posizione);
-    Serial.print(",");
-    Serial.print(velocita);
-    Serial.print(",");
-    Serial.print(accelerazione);
-    Serial.print(",");
-    Serial.println(jerk);
+        // Calcola il jerk (differenza di accelerazione nel tempo)
+        jerk = (accelerazione - lastAccelerazione) / timeStep;
+        lastAccelerazione = accelerazione; // Salva l'ultima accelerazione
 
-    // Aggiorna le variabili per il prossimo ciclo
+        // Invia i dati sulla porta seriale
+        Serial.print(posizione);
+        Serial.print(",");
+        Serial.print(velocita);
+        Serial.print(",");
+        Serial.print(accelerazione);
+        Serial.print(",");
+        Serial.println(jerk);
+    }
 
-
-    // Aspetta 100 ms prima di ripetere il ciclo
-    delay(100);
 }
