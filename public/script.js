@@ -3,19 +3,13 @@ function toggleNightMode() {
     document.body.classList.toggle('text-light');
 }
 
-function setParameter(param) {
-    const value = document.getElementById(param).value;
-    document.getElementById(`current-${param}`).textContent = parseFloat(value).toFixed(3);
-}
-
-
 // Funzione per caricare il codice Arduino
 function loadArduinoCode() {
     const url = 'https://raw.githubusercontent.com/IngPier/Tesi_Bernardis/master/public/Arduino_Sito/Arduino_Sito.ino';
     console.log("Attempting to load Arduino code from:", url); // Log dell'URL
     fetch(url)
         .then(response => {
-            if (!response.ok) {
+            if (!response.ok) { 
                 throw new Error('Rete non ok: ' + response.status);
             }
             return response.text();

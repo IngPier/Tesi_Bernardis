@@ -11,7 +11,7 @@ body {
 /* Modalità notturna */
 .night-mode {
     background-color: #121212; /* Colore di sfondo scuro */
-    color: #000000; /* Colore del testo chiaro */
+    color: #000000;
 }
 
 /* Stili per le card in modalità notturna */
@@ -39,7 +39,7 @@ body {
     border-color: #4caf50; /* Colore del bordo del pulsante di successo */
     color: #fff; /* Colore del testo del pulsante di successo */
 }
-
+ 
 /* Pulsante di pericolo in modalità notturna */
 .night-mode .btn-danger {
     background-color: #f44336; /* Colore di sfondo del pulsante di pericolo */
@@ -49,7 +49,7 @@ body {
 
 /* Titoli in modalità notturna */
 h1, h2, h3, h4, h5, h6, p, label {
-    color: #000000; /* Colore chiaro per i titoli */
+    color: #000000;
 }
 
 
@@ -78,4 +78,12 @@ h1, h2, h3, h4, h5, h6, p, label {
 }
 .code-line:hover {
     background-color: #eef; /* Highlight line on hover */
+}
+
+/* Stile per il valore da confermare */
+.confirmation-pending {
+    border: 2px solid red;
+    padding: 5px;
+    background-color: #f8d7da; /* Colore di sfondo rosso chiaro per evidenziare */
+    color: #721c24; /* Colore del testo rosso scuro per evidenziare */
 }

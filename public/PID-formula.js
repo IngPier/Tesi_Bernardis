@@ -1,3 +1,9 @@
+let confirmedParams = {
+    kp: 0,
+    ki: 0,
+    kd: 0
+};
+
 function decimalToLatexFraction(decimal) {
     const precision = 10000; // Precision for fraction conversion
     const isNegative = decimal < 0; // Check if the number is negative
@@ -17,53 +23,93 @@ function decimalToLatexFraction(decimal) {
     return `${isNegative ? '-' : ''}\\frac{${num / divisor}}{${denom / divisor}}`;
 }
 
-function displayFormula() {
-    // Retrieve values from input fields
-    const kp = parseFloat(document.getElementById("kp").value);
-    const ki = parseFloat(document.getElementById("ki").value);
-    const kd = parseFloat(document.getElementById("kd").value);
+function setParameter(param) {
+    const value = parseFloat(document.getElementById(param).value);
 
-    // Create the formula for each term based on non-zero values
+    // Set the temporary value in confirmedParams, but don't confirm it yet
+    confirmedParams[param] = value;
+
+    // Cambia il testo a fianco al pulsante "Set" per mostrare "Valore da confermare"
+    const statusElement = document.getElementById(`${param}-status`);
+    statusElement.innerHTML = `Da confermare: <span id="current-${param}">${value.toFixed(3)}</span>`;
+
+    // Aggiungi il bordo rosso e la classe per evidenziare il valore da confermare
+    statusElement.classList.add('confirmation-pending');
+}
+
+function displayFormula() {
+    // Quando si clicca "Mostra Formula PID", i valori temporanei sono confermati
+    const kp = confirmedParams.kp;
+    const ki = confirmedParams.ki;
+    const kd = confirmedParams.kd;
+
+    // Aggiorniamo i testi a fianco di ogni parametro per indicare "Attuale" e rimuoviamo la classe
+    document.getElementById("kp-status").innerHTML = `Attuale: <span id="current-kp">${kp.toFixed(3)}</span>`;
+    document.getElementById("ki-status").innerHTML = `Attuale: <span id="current-ki">${ki.toFixed(3)}</span>`;
+    document.getElementById("kd-status").innerHTML = `Attuale: <span id="current-kd">${kd.toFixed(3)}</span>`;
+
+    // Rimuoviamo la classe di conferma per tutti i parametri
+    document.getElementById("kp-status").classList.remove('confirmation-pending');
+    document.getElementById("ki-status").classList.remove('confirmation-pending');
+    document.getElementById("kd-status").classList.remove('confirmation-pending');
+
+    // Creiamo la formula per ogni termine basato sui valori non zero
     const terms = [];
 
     if (kp !== 0) {
-        const kpTerm = (kp === 1 ? "\\epsilon(t)" : `${decimalToLatexFraction(kp)} \\epsilon(t)`);
+        const kpTerm = (kp === 1 ? "e(t)" : `${decimalToLatexFraction(kp)} e(t)`);
         terms.push(kpTerm);
     }
 
     if (ki !== 0) {
-        const kiTerm = (ki === 1 ? "\\int \\epsilon(t) dt" : `${decimalToLatexFraction(ki)} \\int \\epsilon(t) dt`);
+        const kiTerm = (ki === 1 ? "\\int_0^t e(\\tau) d\\tau" : `${decimalToLatexFraction(ki)} \\int_0^t e(\\tau) d\\tau`);
         terms.push(kiTerm);
     }
 
     if (kd !== 0) {
-        const kdTerm = (kd === 1 ? "\\frac{d}{dt} \\epsilon(t)" : `${decimalToLatexFraction(kd)} \\frac{d}{dt} \\epsilon(t)`);
+        const kdTerm = (kd === 1 ? "\\frac{d}{dt} e(t)" : `${decimalToLatexFraction(kd)} \\frac{d}{dt} e(t)`);
         terms.push(kdTerm);
     }
 
-    // Join the terms with appropriate signs
+    // Uniamo i termini con i segni appropriati
     let formula = "";
     for (const term of terms) {
         if (formula === "") {
-            formula += term; // Start the formula with the first term
+            formula += term; // Inizia la formula con il primo termine
         } else {
-            // Check if the current term is negative to determine how to join
+            // Verifica se il termine corrente è negativo per determinare come unire
             if (term.startsWith('-')) {
-                formula += ` ${term}`; // Directly add negative terms
+                formula += ` ${term}`; // Aggiungi i termini negativi direttamente
             } else {
-                formula += ` + ${term}`; // Add positive terms with a plus sign
+                formula += ` + ${term}`; // Aggiungi i termini positivi con il segno "+"
             }
         }
     }
 
-    // Use "0" if all terms are zero
+    // Usa "0" se tutti i termini sono zero
     if (formula === "") {
         formula = "0";
     }
 
-    // Set the HTML content for the result
-    document.getElementById("pid-formula").innerHTML = "$$U(t) = " + formula + "$$";
+    // Impostiamo il contenuto HTML per il risultato
+    document.getElementById("pid-formula").innerHTML = "$$u(t) = " + formula + "$$";
 
-    // Call MathJax to render the added content
+    // Chiama MathJax per renderizzare il contenuto aggiunto
     MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+
+    sendParamsToArduino(kp, ki, kd);
 }
+
+
+function sendParamsToArduino(kp, ki, kd) {
+    if (isConnected && communicationActive) {
+        // Prepara i dati come stringa
+        const params = `${kp.toFixed(3)}, ${ki.toFixed(3)}, ${kd.toFixed(3)}\n`;
+        
+        // Invia i dati ad Arduino tramite la connessione seriale
+        writer.write(new TextEncoder().encode(params));
+        console.log(`Parametri inviati a Arduino: ${params}`);
+    } else {
+        console.warn("Non connesso ad Arduino o comunicazione non attiva.");
+    }
+} 

@@ -4,7 +4,7 @@ const ctxVelocita = document.getElementById('velocitaAngolareChart').getContext(
 const ctxAccelerazione = document.getElementById('accelerazioneAngolareChart').getContext('2d');
 const ctxJerk = document.getElementById('jerkChart').getContext('2d');
 
-// Dati iniziali
+// Dati iniziali 
 let time = 0;
 const timeStep = 0.1; // secondi
 const maxDataPoints = 60; // Numero massimo di punti dati nel grafico
@@ -184,6 +184,7 @@ function processArduinoData(data) {
     try {
         // Expect data in the format "2.00,-1.00,1.00,-5.00"
         const values = data.split(',');
+        console.log(values);
         
         // Convert to floats and assign
         const posizione = parseFloat(values[0]);

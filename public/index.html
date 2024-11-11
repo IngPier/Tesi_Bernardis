@@ -21,7 +21,7 @@
     <script src="PID-formula.js" defer></script> <!-- Script per la formula PID -->
 </head>
 
-<body>
+<body> 
     <div class="container mt-5">
         <div class="text-end mb-4">
             <button class="btn btn-secondary" onclick="toggleNightMode()">Attiva Modalità Notturna</button>
@@ -55,59 +55,55 @@
                     <div class="card-body">
                         <h5 class="card-title">Parametri PID</h5>
 
-                        <!-- Formula PID -->
                         <p id="pid-formula" class="mb-3">
-                            $$ U(t) = K_p \cdot \epsilon (t) + K_i \cdot \int_0^t \epsilon (\tau) d\tau + K_d
-                            \frac{de(t)}{dt} $$
+                            $$ u(t) = K_p \cdot e(t) + K_i \cdot \int_0^t e(\tau) d\tau + K_d \frac{de(t)}{dt} $$
                         </p>
-
+                        
                         <!-- Parametro Kp -->
                         <div class="mb-3 row align-items-center">
-                            <label for="kp" class="col-3 col-form-label">K<sub>p</sub>:</label>
-                            <div class="col-4">
-                                <input type="number" id="kp" class="form-control" step="0.001" min="-1000.0"
-                                    value="0" />
+                            <label for="kp" class="col-2 col-form-label">K<sub>p</sub>:</label>
+                            <div class="col-3">
+                                <input type="number" id="kp" class="form-control" step="0.001" min="-1000.0" value="0" />
                             </div>
                             <div class="col-2">
                                 <button class="btn btn-primary" onclick="setParameter('kp')">Set</button>
                             </div>
-                            <div class="col-3">
-                                <p class="mb-0">Attuale: <span id="current-kp">0.000</span></p>
+                            <div class="col-5">
+
+                                <p class="mb-0" id="kp-status">Attuale: <span id="current-kp">0.000</span></p>
                             </div>
                         </div>
-
+                        
                         <!-- Parametro Ki -->
                         <div class="mb-3 row align-items-center">
-                            <label for="ki" class="col-3 col-form-label">K<sub>i</sub>:</label>
-                            <div class="col-4">
-                                <input type="number" id="ki" class="form-control" step="0.001" min="-1000.0"
-                                    value="0" />
+                            <label for="ki" class="col-2 col-form-label">K<sub>i</sub>:</label>
+                            <div class="col-3">
+                                <input type="number" id="ki" class="form-control" step="0.001" min="-1000.0" value="0" />
                             </div>
                             <div class="col-2">
                                 <button class="btn btn-primary" onclick="setParameter('ki')">Set</button>
                             </div>
-                            <div class="col-3">
-                                <p class="mb-0">Attuale: <span id="current-ki">0.000</span></p>
+                            <div class="col-5">
+                                <p class="mb-0" id="ki-status">Attuale: <span id="current-ki">0.000</span></p>
                             </div>
                         </div>
-
+                        
                         <!-- Parametro Kd -->
                         <div class="mb-3 row align-items-center">
-                            <label for="kd" class="col-3 col-form-label">K<sub>d</sub>:</label>
-                            <div class="col-4">
-                                <input type="number" id="kd" class="form-control" step="0.001" min="-1000.0"
-                                    value="0" />
+                            <label for="kd" class="col-2 col-form-label">K<sub>d</sub>:</label>
+                            <div class="col-3">
+                                <input type="number" id="kd" class="form-control" step="0.001" min="-1000.0" value="0" />
                             </div>
                             <div class="col-2">
                                 <button class="btn btn-primary" onclick="setParameter('kd')">Set</button>
                             </div>
-                            <div class="col-3">
-                                <p class="mb-0">Attuale: <span id="current-kd">0.000</span></p>
+                            <div class="col-5">
+                                <p class="mb-0" id="kd-status">Attuale: <span id="current-kd">0.000</span></p>
                             </div>
                         </div>
-
-                        <button class="btn btn-success w-100 mt-3" onclick="displayFormula()">Mostra Formula
-                            PID</button>
+                        
+                        <button class="btn btn-success w-100 mt-3" onclick="displayFormula()">Mostra Formula PID</button>
+                        
                     </div>
                 </div>
             </div>
